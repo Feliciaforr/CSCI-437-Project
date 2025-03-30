@@ -1,0 +1,6 @@
+venv/
+__pychache__/
+*.pyc
+data/live_prices.db
+data/cache/
+.DS_Store
