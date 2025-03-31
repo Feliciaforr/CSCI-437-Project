@@ -1,8 +1,8 @@
 from flask import Blueprint
 
-auth_routes = Blueprint("auth",  __name__)
+auth = Blueprint("auth",  __name__)
 
-auth_routes.route('/login', methods=['POST'])
+@auth.route('/login')
 def login():
     return "Login works!"
 # This is a simple Flask blueprint for authentication routes.

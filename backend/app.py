@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
-from routes.auth_routes import auth_routes
+from routes.auth_routes import auth
 
 
 # Initialize Flask application
@@ -17,11 +17,12 @@ CORS(app)
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 
-app.register_blueprint(auth_routes, url_prefix='/auth')
+
 # Configure database URI
 
 
 
+app.register_blueprint(auth, url_prefix='/auth')
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
@@ -29,8 +30,9 @@ def hello_world():
 
 
 
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True, port=5000)
+    app.run(host='0.0.0.0',debug=True, port=9000)
 # This is a simple Flask application that returns "Hello, World!" when accessed at the root URL.
 # The application is set to run in debug mode, which is useful for development.
 # To run this application, save it as app.py and execute it with Python.
