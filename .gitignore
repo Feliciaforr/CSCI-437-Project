@@ -4,4 +4,4 @@ __pychache__/
 data/live_prices.db
 data/cache/
 .DS_Store
-dd.txt
+.vscode/
