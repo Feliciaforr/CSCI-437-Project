@@ -13,9 +13,26 @@ app = Flask(__name__)
 load_dotenv()
 
 CORS(app)
+app.config['FLASK_ENV'] = os.getenv('FLASK_ENV')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Configure database connection
+db_user = os.getenv('DB_USER')
+db_password = os.getenv('DB_PASSWORD')
+db_host = os.getenv('DB_HOST')
+db_port = os.getenv('DB_PORT')
+db_name = os.getenv('DB_NAME')
+# Configure database URI
+db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()  
 
 
 # Configure database URI
