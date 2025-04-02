@@ -1,9 +1,11 @@
 from flask import Flask
 from dotenv import load_dotenv
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 import os
 from routes.auth_routes import auth
+import sys
+from models.user import User
+from extensiton import dbs
 
 
 # Initialize Flask application
@@ -27,12 +29,9 @@ db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
 
-# Initialize SQLAlchemy
-db = SQLAlchemy()
-db.init_app(app)
 
-with app.app_context():
-    db.create_all()  
+
+dbs.init_app(app)
 
 
 # Configure database URI
@@ -49,6 +48,8 @@ def hello_world():
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        dbs.create_all()  
     app.run(host='0.0.0.0',debug=True, port=9000)
 # This is a simple Flask application that returns "Hello, World!" when accessed at the root URL.
 # The application is set to run in debug mode, which is useful for development.
