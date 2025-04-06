@@ -4,13 +4,7 @@ from flask_cors import CORS
 import os
 from routes.auth_routes import auth
 import sys
-from models.user import User
-from models.stock import Stock
-from models.stock_price_today import StockPriceToday
-from models.stock_price_current import StockCurrentprice
-from models.transaction import Transaction
-from models.portfolio import Portfolio
-from models.alerts import Alert
+from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice
 from extensiton import dbs
 
 
