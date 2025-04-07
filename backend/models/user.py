@@ -15,6 +15,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    role = db.Column(db.String(20), nullable=False, default="customer")
     
     
     """User model for authentication and profile management.
