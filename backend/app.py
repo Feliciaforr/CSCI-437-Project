@@ -6,6 +6,7 @@ from routes.auth_routes import auth
 import sys
 from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice
 from extensiton import dbs
+from models.user import User
 
 
 # Initialize Flask application
