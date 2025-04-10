@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from extensiton import dbs as db
 from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 # Blueprint for authentication-related routes
 auth = Blueprint("auth", __name__)
@@ -27,10 +28,16 @@ def login():
     # Verify the provided password
     if not check_password_hash(user.password, password):
         return jsonify({'error': 'Invalid password'}), 401
+    
+    #Gernerate JWT token for the user
+    additional_claims = {"role": user.role}
+    access_token = create_access_token(identity=str(user.id), additional_claims=additional_claims)
+   
 
     # Return user details on successful login
     return jsonify({
         'message': 'Login successful',
+        'access_token': access_token,
         'user': {
             'id': user.id,
             'username': user.username,
@@ -44,7 +51,7 @@ def login():
 @auth.route('/register', methods=['POST'])
 def register():
     """
-    Handles user registration by creating a new user.
+    Handles user registration by creating a new user. 
     """
     data = request.get_json()
     
@@ -77,6 +84,30 @@ def register():
     
     # Return a success message
     return jsonify({"message": "You did it Son"}), 201
+
+
+@auth.route('/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    """
+    Retrieves the current user's information.
+    """
+    user_id = get_jwt_identity()
+    
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "name": user.name,
+        "account_balance": user.account_balance,
+        "role": user.role
+    }), 200
 
 # This file defines routes for user authentication, including login and registration.
 # The routes are part of the 'auth' blueprint, which can be registered with a Flask app.
