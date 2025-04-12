@@ -7,6 +7,7 @@ import sys
 from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice
 from extensiton import dbs
 from models.user import User
+from flask_jwt_extended import JWTManager
 
 
 # Initialize Flask application
@@ -18,6 +19,8 @@ load_dotenv()
 CORS(app)
 app.config['FLASK_ENV'] = os.getenv('FLASK_ENV')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 
 # Configure database connection
 db_user = os.getenv('DB_USER')
@@ -31,7 +34,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
 
 
-
+jwt = JWTManager(app)
 dbs.init_app(app)
 
 
