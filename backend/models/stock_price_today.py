@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from extensiton import dbs as db
+from backend.extension import dbs as db
 
 class StockPriceToday(db.Model):
     """StockPriceToday model for tracking today's stock prices.
@@ -23,6 +23,7 @@ class StockPriceToday(db.Model):
     time_stamp = db.Column(db.DateTime, nullable=False, default=datetime.now)
     price = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    date = db.Column(db.Date, nullable=False)
     
     stock = db.relationship('Stock', backref='stock_price_today', lazy=True)
     

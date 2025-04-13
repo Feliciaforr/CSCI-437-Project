@@ -1,11 +1,14 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import Flask
 from dotenv import load_dotenv
 from flask_cors import CORS
 import os
 from routes.auth_routes import auth
 import sys
-from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice
-from extensiton import dbs
+from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, stock_history
+from backend.extension import dbs
 from models.user import User
 from flask_jwt_extended import JWTManager
 
