@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from extensiton import dbs as db
+from backend.extension import dbs as db
 
 class Transaction(db.Model):
     """Transaction model for recording stock transactions.

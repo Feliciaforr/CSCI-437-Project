@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from extensiton import dbs as db
+from backend.extension import dbs as db
 
 """Portfolio model for tracking user stock holdings.
 

@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from extensiton import dbs as db
+from backend.extension import dbs as db
 
 
 class StockCurrentprice(db.Model):
@@ -19,6 +19,7 @@ class StockCurrentprice(db.Model):
     stock_id = db.Column(db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     price = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
     
     stock = db.relationship('Stock', backref='current_prices')
     
