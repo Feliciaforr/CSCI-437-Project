@@ -5,11 +5,13 @@ from flask import Flask
 from dotenv import load_dotenv
 from flask_cors import CORS
 import os
-from routes.auth_routes import auth
+# from routes.auth_routes import auth
+from backend.routes.auth_routes import auth
+from backend.routes.trade import trade
 import sys
-from models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, stock_history
+from backend.models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, stock_history
 from backend.extension import dbs
-from models.user import User
+# from models.user import User
 from flask_jwt_extended import JWTManager
 
 
@@ -46,6 +48,7 @@ dbs.init_app(app)
 
 
 app.register_blueprint(auth, url_prefix='/auth')
+app.register_blueprint(trade, url_prefix='/trade')
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
