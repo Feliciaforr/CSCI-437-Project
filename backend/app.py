@@ -9,7 +9,7 @@ import os
 from backend.routes.auth_routes import auth
 from backend.routes.trade import trade
 import sys
-from backend.models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, stock_history
+from backend.models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, StockHistory
 from backend.extension import dbs
 # from models.user import User
 from flask_jwt_extended import JWTManager
