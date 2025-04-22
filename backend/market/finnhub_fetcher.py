@@ -8,31 +8,32 @@ from dotenv import load_dotenv
 from backend.models import Stock, StockPriceToday, StockCurrentprice
 from flask import Flask
 import yfinance as yf
+from backend.app import app
 
 # Initialize Flask app and database
-app = Flask(__name__)
-load_dotenv()
+# app = Flask(__name__)
+# load_dotenv()
 
-# Configure database connection
-db_user = os.getenv('DB_USER')
-db_password = os.getenv('DB_PASSWORD')
-db_host = os.getenv('DB_HOST')
-db_port = os.getenv('DB_PORT')
-db_name = os.getenv('DB_NAME')
-db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-db.init_app(app)
+# # Configure database connection
+# db_user = os.getenv('DB_USER')
+# db_password = os.getenv('DB_PASSWORD')
+# db_host = os.getenv('DB_HOST')
+# db_port = os.getenv('DB_PORT')
+# db_name = os.getenv('DB_NAME')
+# db_uri = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+# app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+# db.init_app(app)
 
 # Finnhub API configuration
 FINHUB_API_KEY = os.getenv('FINHUB_API_KEY')
 FINNHUB_URL = "https://finnhub.io/api/v1/stock/candle"
 
 # Test connection with a specific time range
-est_offset = timedelta(hours=-4)
-from_dt = datetime(2025, 4, 11, 9, 30, tzinfo=timezone(est_offset))  # Start of trading day
-to_dt = datetime(2025, 4, 11, 14, 0, tzinfo=timezone(est_offset))  # Midday
-FROM_UNIX = int(from_dt.timestamp())
-TO_UNIX = int(to_dt.timestamp())
+# est_offset = timedelta(hours=-4)
+# from_dt = datetime(2025, 4, 11, 9, 30, tzinfo=timezone(est_offset))  # Start of trading day
+# to_dt = datetime(2025, 4, 11, 14, 0, tzinfo=timezone(est_offset))  # Midday
+# FROM_UNIX = int(from_dt.timestamp())
+# TO_UNIX = int(to_dt.timestamp())
 
 # Function to fetch and store intraday data (runs once at the start of the day)
 def fetch_and_store_intraday_data():
@@ -86,6 +87,8 @@ def fetch_and_store_intraday_data():
 # Function to update current prices (runs every 20 seconds)
 def update_current_prices_only():
     with app.app_context():
+        db.session.query(StockCurrentprice).delete()
+        db.session.commit()
         stocks = Stock.query.all()  # Fetch all stocks from the database
 
         for stock in stocks:
@@ -111,6 +114,7 @@ def update_current_prices_only():
             #     existing.price = current_price
             #     existing.timestamp = now
             # else:
+            print(f"Adding current price for {stock.symbol}: {current_price}")
             db.session.add(StockCurrentprice(
                     stock_id=stock.id,
                     price=current_price,
