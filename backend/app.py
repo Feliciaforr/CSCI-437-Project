@@ -12,6 +12,7 @@ from backend.routes.alerts_notfications import alert
 from backend.routes.suggestions import suggestions
 from backend.routes.win_loss import win_loss
 from backend.routes.agent import agent
+from backend.routes.show_list import show_list
 import sys
 from backend.models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, StockHistory
 from backend.extension import dbs
@@ -56,6 +57,7 @@ app.register_blueprint(alert,url_prefix='/alert')
 app.register_blueprint(suggestions,url_prefix='/suggest')
 app.register_blueprint(win_loss,url_prefix='/win_loss')
 app.register_blueprint(agent,url_prefix='/agent')
+app.register_blueprint(show_list,url_prefix='/fetch')
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
