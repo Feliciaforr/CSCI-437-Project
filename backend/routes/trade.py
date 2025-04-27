@@ -20,6 +20,13 @@ def buy_share():
         return jsonify({"error":"Missing symbol or quantity"}), 400
     
     user_id = get_jwt_identity()
+    acting_customer_id = request.args.get('acting_customer_id')
+    if acting_customer_id:
+        user = User.query.get(user_id)
+        if user.role != 'agent':
+            return jsonify({"error": "Unauthorized impersonation attempt"}), 403
+        user_id = acting_customer_id
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error":"User not found"}), 404
@@ -92,6 +99,13 @@ def sell_share():
         return jsonify({"error": "Missing symbol or quantity"}), 400
 
     user_id = get_jwt_identity()
+    acting_customer_id = request.args.get('acting_customer_id')
+    if acting_customer_id:
+        user = User.query.get(user_id)
+        if user.role != 'agent':
+            return jsonify({"error": "Unauthorized impersonation attempt"}), 403
+        user_id = acting_customer_id
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
@@ -143,6 +157,13 @@ def sell_share():
 @jwt_required()
 def get_trade_history():
     user_id = get_jwt_identity()
+    acting_customer_id = request.args.get('acting_customer_id')
+    if acting_customer_id:
+        user = User.query.get(user_id)
+        if user.role != 'agent':
+            return jsonify({"error": "Unauthorized impersonation attempt"}), 403
+        user_id = acting_customer_id
+
     transactions = Transaction.query.filter_by(user_id=user_id).order_by(Transaction.timestamp.desc()).all()
     if not transactions:
         return jsonify({"message": "No trade history found"}), 404
@@ -163,6 +184,13 @@ def get_trade_history():
 @jwt_required()
 def get_portfolio():
     user_id = get_jwt_identity()
+    acting_customer_id = request.args.get('acting_customer_id')
+    if acting_customer_id:
+        user = User.query.get(user_id)
+        if user.role != 'agent':
+            return jsonify({"error": "Unauthorized impersonation attempt"}), 403
+        user_id = acting_customer_id
+
     portfolio_items = Portfolio.query.filter_by(user_id=user_id).all()
 
     if not portfolio_items:
