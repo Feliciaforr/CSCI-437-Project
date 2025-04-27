@@ -8,10 +8,13 @@ import os
 # from routes.auth_routes import auth
 from backend.routes.auth_routes import auth
 from backend.routes.trade import trade
+from backend.routes.alerts_notfications import alert
+from backend.routes.suggestions import suggestions
+from backend.routes.win_loss import win_loss
+from backend.routes.agent import agent
 import sys
 from backend.models import User, Stock, Portfolio, Transaction, Alert, StockPriceToday, StockCurrentprice, StockHistory
 from backend.extension import dbs
-# from models.user import User
 from flask_jwt_extended import JWTManager
 
 
@@ -49,6 +52,10 @@ dbs.init_app(app)
 
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(trade, url_prefix='/trade')
+app.register_blueprint(alert,url_prefix='/alert')
+app.register_blueprint(suggestions,url_prefix='/suggest')
+app.register_blueprint(win_loss,url_prefix='/win_loss')
+app.register_blueprint(agent,url_prefix='/agent')
 @app.route('/')
 def hello_world():
     return 'Hello, World!'

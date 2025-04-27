@@ -20,7 +20,7 @@ Fields:
 class Alert(db.Model):
     __tablename__ = 'alerts'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     stock_id = db.Column(db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     change_percentage = db.Column(db.Float, nullable=False)
     direction = db.Column(db.String(10), nullable=False)  # 'up' or 'down'
