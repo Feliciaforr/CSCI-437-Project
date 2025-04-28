@@ -84,44 +84,38 @@ def fetch_and_store_intraday_data():
 
         print("All intraday data saved successfully using Yahoo Finance.")
 
-# Function to update current prices (runs every 20 seconds)
+
 def update_current_prices_only():
     with app.app_context():
-        db.session.query(StockCurrentprice).delete()
-        db.session.commit()
-        stocks = Stock.query.all()  # Fetch all stocks from the database
-
+        stocks = Stock.query.all()
         for stock in stocks:
             params = {
                 "symbol": stock.symbol,
                 "token": FINHUB_API_KEY
             }
 
-            # Fetch the current price from Finnhub API
             response = requests.get("https://finnhub.io/api/v1/quote", params=params)
             data = response.json()
 
-            if not data.get("c"):  # Skip if no current price is available
+            if not data.get("c"):
                 print(f"Failed to fetch current price for {stock.symbol}")
                 continue
 
-            current_price = data["c"]  # Current price
-            now = datetime.now()  # Current timestamp
+            current_price = data["c"]
+            now = datetime.now()
 
-            # Update or insert into StockCurrentprice
-            # existing = StockCurrentprice.query.filter_by(stock_id=stock.id).first()
-            # if existing:
-            #     existing.price = current_price
-            #     existing.timestamp = now
-            # else:
-            print(f"Adding current price for {stock.symbol}: {current_price}")
-            db.session.add(StockCurrentprice(
+            existing = StockCurrentprice.query.filter_by(stock_id=stock.id).first()
+
+            if existing:
+                existing.price = current_price
+                existing.timestamp = now
+            else:
+                db.session.add(StockCurrentprice(
                     stock_id=stock.id,
                     price=current_price,
                     timestamp=now
                 ))
 
-            # Append the current price to StockPriceToday
             db.session.add(StockPriceToday(
                 stock_id=stock.id,
                 symbol=stock.symbol,
@@ -130,11 +124,8 @@ def update_current_prices_only():
                 date=now.date()
             ))
 
-        db.session.commit() 
-        # Commit all changes
-        after = db.session.query(StockPriceToday).count()
-        print(after)
-        print("Live prices are being updated every 20 seconds.")
+        db.session.commit()
+        print("Live prices updated safely.")
 
 """
 This script integrates with Yahoo Finance and Finnhub APIs to manage stock price data.
