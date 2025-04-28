@@ -1,0 +1,1 @@
+setx PATH "C:\Program Files\Python313\;C:\Program Files\Python313\Scripts\;%PATH%"
