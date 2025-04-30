@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QTextEdit, QComboBox, QHBoxLayout, QPushButton,
-    QStackedWidget, QFrame, QSizePolicy,  QLineEdit,QMenu,QLabel,QMessageBox, QTabWidget
+    QStackedWidget, QFrame, QSizePolicy,  QLineEdit,QMenu,QLabel,QMessageBox, QTabWidget,QListWidget, QGroupBox, QSizePolicy,QTableWidget,QLineEdit, QRadioButton, QButtonGroup
    
 )
 from PyQt6.QtGui import QFont, QIcon, QPixmap
@@ -73,8 +73,15 @@ class DashboardPage(QWidget):
         home_btn = QPushButton("HOME")
         login_btn = QPushButton("LOGIN")
         support_btn = QPushButton("SUPPORT")
-        for btn in (home_btn, login_btn, support_btn):
+        agent_btn = QPushButton("AGENT")
+        for btn in (home_btn, login_btn, support_btn, agent_btn):
             btn.setStyleSheet(btn_style)
+            top_nav.addWidget(btn)
+
+       
+        agent_btn.setStyleSheet(btn_style)
+        top_nav.addWidget(agent_btn)
+
             
 
         menu_btn = QPushButton("MENU")
@@ -86,6 +93,11 @@ class DashboardPage(QWidget):
         menu.addAction("Active Companies")
         menu_btn.setMenu(menu)
         top_nav.addWidget(menu_btn)
+
+        agent_btn = QPushButton("Agent")
+
+        
+
 
 
 
@@ -308,38 +320,134 @@ class LoginPage(QWidget):
 
         QMessageBox.information(self, "Register",
                                 f"Registration attempted for {name}\nEmail: {email}\nContact: {contact}")
+        
 
-
+ 
 
 
 # Agent page here
 class AgentPage(QWidget):
-    def __init__(self):
-        super().__init__()
+     def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("""
+            QLabel#titleLabel {
+                font-size: 24px;
+                font-weight: bold;
+                padding: 10px 0;
+            }
+            QGroupBox {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                padding: 10px;
+            }
+            QPushButton {
+                padding: 8px;
+                background-color: #0078D7;
+                color: white;
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: #005A9E;
+            }
+        """)
+        self.init_ui()
+
+     def init_ui(self):
         layout = QVBoxLayout()
 
-        title = QLabel("Agent Dashboard")
-        title.setStyleSheet("font-size: 24px; font-weight: bold; color: #34495e")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Title
+        title_label = QLabel("Agent Dashboard")
+        title_label.setObjectName("titleLabel")
+        layout.addWidget(title_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Example agent controls
-        info_btn = QPushButton("View Customer Info")
-        buy_btn = QPushButton("Buy Stocks for Customer")
-        sell_btn = QPushButton("Sell Stocks for Customer")
-        transactions_btn = QPushButton("View All Transactions")
+         # Overview Cards
+        stats_layout = QHBoxLayout()
+        stats_layout.addWidget(self.create_stat_box("Total Clients", "12"))
+        stats_layout.addWidget(self.create_stat_box("Stocks Bought", "35"))
+        stats_layout.addWidget(self.create_stat_box("Stocks Sold", "27"))
+        stats_layout.addWidget(self.create_stat_box("Active Stocks", "18"))
+        layout.addLayout(stats_layout)
 
-        for btn in [info_btn, buy_btn, sell_btn, transactions_btn]:
-            btn.setFixedHeight(40)
-            btn.setStyleSheet("font-size: 16px;")
+        # Clients Table
+        client_group = QGroupBox("Client Buy/Sell Activity")
+        client_layout = QVBoxLayout()
+        self.client_table = QTableWidget(5, 5)
+        self.client_table.setHorizontalHeaderLabels(["Client", "Stock", "Type", "Amount", "Date"])
+        self.client_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        client_layout.addWidget(self.client_table)
+        client_group.setLayout(client_layout)
+        layout.addWidget(client_group)
 
-        layout.addWidget(title)
-        layout.addWidget(info_btn)
-        layout.addWidget(buy_btn)
-        layout.addWidget(sell_btn)
-        layout.addWidget(transactions_btn)
-        layout.addStretch()
+        # Active Stock Data Section
+        stock_group = QGroupBox("Active Stock Data")
+        stock_layout = QVBoxLayout()
+        self.stock_table = QTableWidget(5, 4)
+        self.stock_table.setHorizontalHeaderLabels(["Stock", "Price", "Change", "Volume"])
+        self.stock_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        stock_layout.addWidget(self.stock_table)
+        stock_group.setLayout(stock_layout)
+        layout.addWidget(stock_group)
+
+        # Alert Button
+        alert_button = QPushButton("Send Alert")
+        layout.addWidget(alert_button, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.setLayout(layout)
+
+         # Buy/Sell Section
+        trade_group = QGroupBox("Buy/Sell Client Stock")
+        trade_layout = QVBoxLayout()
+
+        form_layout = QHBoxLayout()
+
+        self.client_combo = QComboBox()
+        self.client_combo.addItems(["Client A", "Client B", "Client C"])
+
+        self.stock_combo = QComboBox()
+        self.stock_combo.addItems(["AAPL", "TSLA", "GOOGL", "AMZN"])
+
+        self.amount_input = QLineEdit()
+        self.amount_input.setPlaceholderText("Amount")
+
+        # Radio buttons for Buy/Sell
+        self.buy_radio = QRadioButton("Buy")
+        self.sell_radio = QRadioButton("Sell")
+        self.buy_radio.setChecked(True)
+
+        radio_group = QButtonGroup(self)
+        radio_group.addButton(self.buy_radio)
+        radio_group.addButton(self.sell_radio)
+
+        # Add all to form layout
+        form_layout.addWidget(QLabel("Client:"))
+        form_layout.addWidget(self.client_combo)
+        form_layout.addWidget(QLabel("Stock:"))
+        form_layout.addWidget(self.stock_combo)
+        form_layout.addWidget(QLabel("Amount:"))
+        form_layout.addWidget(self.amount_input)
+        form_layout.addWidget(self.buy_radio)
+        form_layout.addWidget(self.sell_radio)
+
+        self.trade_button = QPushButton("Submit Order")
+
+        trade_layout.addLayout(form_layout)
+        trade_layout.addWidget(self.trade_button, alignment=Qt.AlignmentFlag.AlignRight)
+        trade_group.setLayout(trade_layout)
+        layout.addWidget(trade_group)
+
+        self.setLayout(layout)
+
+     def create_stat_box(self, title, value):
+        box = QGroupBox(title)
+        box_layout = QVBoxLayout()
+        value_label = QLabel(value)
+        value_label.setFont(QFont("Arial", 18, weight=QFont.Weight.Bold))
+        value_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        box_layout.addWidget(value_label)
+        box.setLayout(box_layout)
+        box.setFixedWidth(150)
+        return box
+        
 
 # Customer page here
 class CustomerPage(QWidget):
@@ -386,10 +494,18 @@ class MainWindow(QWidget):
         self.dashboard_page = DashboardPage()
         self.login_page = LoginPage()
         self.support_page = SupportPage()
+        self.agent_page = AgentPage()
+        
+       
+     
 
         self.stack.addWidget(self.dashboard_page)  # Home Page
         self.stack.addWidget(self.login_page)      # Login Page
         self.stack.addWidget(self.support_page)    # Support Page
+        self.stack.addWidget(self.agent_page)
+
+      
+
 
         # --- Top Navigation Bar (Always Visible) ---
         top_nav = QHBoxLayout()
@@ -413,14 +529,21 @@ class MainWindow(QWidget):
         home_btn = QPushButton("HOME")
         login_btn = QPushButton("LOGIN")
         support_btn = QPushButton("SUPPORT")
+        agent_btn = QPushButton("AGENT")
         menu_btn = QPushButton("MENU")
-        for btn in (home_btn, login_btn, support_btn):
+       
+
+
+        for btn in (home_btn, login_btn, support_btn, agent_btn):
             btn.setStyleSheet(btn_style)
 
         top_nav.addWidget(home_btn)
         top_nav.addWidget(support_btn)
         top_nav.addWidget(login_btn)
+        top_nav.addWidget(agent_btn)
         top_nav.addWidget(menu_btn)
+        
+
         menu_btn.setStyleSheet(btn_style)
         menu = QMenu()
         menu.addAction("Sign Out")
@@ -441,6 +564,9 @@ class MainWindow(QWidget):
         home_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         login_btn.clicked.connect(lambda: self.stack.setCurrentIndex(1))
         support_btn.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        agent_btn.clicked.connect(lambda: self.stack.setCurrentIndex(3))
+    
+
 
         main_layout.addWidget(self.stack)
         self.setLayout(main_layout)
