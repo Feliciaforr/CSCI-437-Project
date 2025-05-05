@@ -10,29 +10,29 @@ from gui.support_page import SupportPage
 
 # --- Main Application Window ---
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, token):
         super().__init__()
-        self.setWindowTitle("Stock Exchange Dashboard")
-        self.setMinimumSize(100, 100)
+        self.token = token
+        # self.setWindowTitle("Stock Exchange Dashboard")
+        # self.setMinimumSize(100, 100)
         self.initUI()
+        
 
     def initUI(self):
         main_layout = QVBoxLayout()
 
         # Pages
         self.stack = QStackedWidget()
-        self.dashboard_page = DashboardPage()
-        self.login_page = LoginPage()
+        self.dashboard_page = DashboardPage(self.token)
         self.support_page = SupportPage()
 
         self.stack.addWidget(self.dashboard_page)
-        self.stack.addWidget(self.login_page)
         self.stack.addWidget(self.support_page)
 
         # Top Navigation Bar
         top_nav = QHBoxLayout()
         logo = QLabel("STOCKSIGHT")
-        logo.setFont(QFont('Arial', 12, QFont.Weight.Bold))
+        logo.setFont(QFont('Arial', 16, QFont.Weight.Bold))
         top_nav.addWidget(logo)
         top_nav.addStretch()
 
@@ -41,19 +41,18 @@ class MainWindow(QWidget):
                 border: none;
                 background: none;
                 font-weight: bold;
-                color: black;
+                color: white;
             }
             QPushButton:hover {
-                color: #007acc;
+                color: #F26E22;
             }
         """
 
         home_btn = QPushButton("HOME")
-        login_btn = QPushButton("LOGIN")
         support_btn = QPushButton("SUPPORT")
         menu_btn = QPushButton("MENU")
         
-        for btn in (home_btn, login_btn, support_btn):
+        for btn in (home_btn, support_btn):
             btn.setStyleSheet(btn_style)
         
         menu_btn.setStyleSheet(btn_style)
@@ -65,7 +64,6 @@ class MainWindow(QWidget):
         menu_btn.setMenu(menu)
 
         top_nav.addWidget(home_btn)
-        top_nav.addWidget(login_btn)
         top_nav.addWidget(support_btn)
         top_nav.addWidget(menu_btn)
 
@@ -73,9 +71,7 @@ class MainWindow(QWidget):
 
         # Button functionality
         home_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
-        login_btn.clicked.connect(lambda: self.stack.setCurrentIndex(1))
-        support_btn.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        support_btn.clicked.connect(lambda: self.stack.setCurrentIndex(1))
 
         main_layout.addWidget(self.stack)
         self.setLayout(main_layout)
-

@@ -53,12 +53,12 @@ def calculate_stock_changes():
 @jwt_required()
 def get_gainers():
     changes = calculate_stock_changes()
-    gainers = sorted([s for s in changes if s['percent_change'] > 0], key=lambda x: x['percent_change'], reverse=True)[:4]
+    gainers = sorted([s for s in changes if s['percent_change'] > 0], key=lambda x: x['percent_change'], reverse=True)[:6]
     return jsonify(gainers), 200
 
 @win_loss.route('/losers', methods=['GET'])
 @jwt_required()
 def get_losers():
     changes = calculate_stock_changes()
-    losers = sorted([s for s in changes if s['percent_change'] < 0], key=lambda x: x['percent_change'])[:4]
+    losers = sorted([s for s in changes if s['percent_change'] < 0], key=lambda x: x['percent_change'])[:6]
     return jsonify(losers), 200
