@@ -1,7 +1,7 @@
-# login_page.py
+
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTabWidget, QTextEdit, QComboBox, QMessageBox
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
 import requests
 
@@ -17,9 +17,11 @@ class LoginPage(QWidget):
         self.layout = QVBoxLayout()
 
         # Add a logo at the top
-        logo_label = QLabel("📈")
+        logo_label = QLabel()
+        pixmap = QPixmap("/Users/amangill/Stock_trade_project/project/gui/Stocksight logo.png")
+        pixmap = pixmap.scaledToHeight(80, Qt.TransformationMode.SmoothTransformation)
+        logo_label.setPixmap(pixmap)
         logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logo_label.setStyleSheet("font-size: 60px;")
         self.layout.addWidget(logo_label)
 
         # Add a welcome message
@@ -32,11 +34,11 @@ class LoginPage(QWidget):
         self.tabs = QTabWidget()
         self.login_tab = QWidget()
         self.register_tab = QWidget()
-        self.testing_tab = QWidget()  # **TESTING TAB INITIALIZATION**
+        self.testing_tab = QWidget()  
 
         self.tabs.addTab(self.login_tab, "Login")
         self.tabs.addTab(self.register_tab, "Register")
-        self.tabs.addTab(self.testing_tab, "Testing")  # **ADD TESTING TAB**
+        self.tabs.addTab(self.testing_tab, "Testing")  
 
         self.layout.addWidget(self.tabs)
 
@@ -151,6 +153,7 @@ class LoginPage(QWidget):
             if response.status_code == 200:
                 data = response.json()
                 token = data.get('access_token')
+                role =  data.get('user', {}).get('role')
 
                 if token:
                     QMessageBox.information(self, "Login Successful", f"Welcome!")
@@ -161,7 +164,7 @@ class LoginPage(QWidget):
                     self.parent().setProperty('username', username)
 
                     # Switch to the main application view
-                    self.parent().show_main_window(token)
+                    self.parent().show_main_window(token, role)
                 else:
                     QMessageBox.warning(self, "Error", "Login failed. No token received.")
             else:
@@ -240,28 +243,28 @@ class LoginPage(QWidget):
         
     def test_function(self):
         # Placeholder for testing functionality
-        # QMessageBox.information(self, "Test", "This is a test function.")
+    
         try:
-            # Send login request to the backend
             response = requests.post("http://127.0.0.1:9000/auth/login", json={
-                "email": "test@gmail.com",
-                "password": "12345678",
+                "email": "agent001@example.com",
+                "password": "strongpassword123",
             })
 
             if response.status_code == 200:
                 data = response.json()
                 token = data.get('access_token')
+                role =  data.get('user', {}).get('role')
 
                 if token:
                     # QMessageBox.information(self, "Login Successful", f"Welcome!")
 
-                    # Store token and role in the parent widget
+
                     self.parent().setProperty('access_token', token)
                     # self.parent().setProperty('role', role)
                     # self.parent().setProperty('username', username)
 
-                    # Switch to the main application view
-                    self.parent().show_main_window(token)
+      
+                    self.parent().show_main_window(token, role)
                 else:
                     QMessageBox.warning(self, "Error", "Login failed. No token received.")
             else:

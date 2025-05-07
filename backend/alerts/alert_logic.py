@@ -7,7 +7,7 @@ from backend.extension import dbs as db
 from backend.app import app
 import time, math
 
-INTERVAL = 0.00000000001  #subject to change
+INTERVAL = 2 #subject to change
 
 def start_alert_checks():
     with app.app_context():

@@ -20,8 +20,8 @@ class MainApp(QStackedWidget):
         self.addWidget(self.dashboard)
         self.setCurrentWidget(self.dashboard)
         
-    def show_main_window(self, token):
-        self.main_window = MainWindow(token)
+    def show_main_window(self, token, role):
+        self.main_window = MainWindow(token, role)
         self.addWidget(self.main_window)
         self.setCurrentWidget(self.main_window)
         

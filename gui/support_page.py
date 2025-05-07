@@ -75,3 +75,14 @@ class SupportPage(QWidget):
         QMessageBox.information(self, "Issue Submitted", f"Your issue has been submitted:\n\n{description}")
 
 # ------ End of support_page.py ------
+
+if __name__ == "__main__":
+    import sys
+    from PyQt6.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+    window = SupportPage()
+    window.setWindowTitle("Support Page")
+    window.resize(400, 300)
+    window.show()
+    sys.exit(app.exec())

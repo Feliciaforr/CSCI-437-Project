@@ -31,3 +31,14 @@ class AgentPage(QWidget):
         layout.addStretch()
 
         self.setLayout(layout)
+
+if __name__ == "__main__":
+    import sys
+    from PyQt6.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+    window = AgentPage()
+    window.setWindowTitle("Agent Dashboard")
+    window.resize(400, 300)
+    window.show()
+    sys.exit(app.exec())

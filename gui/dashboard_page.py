@@ -1,3 +1,4 @@
+from gui.customer_page import CustomerPage
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QMenu, QFrame, QScrollArea, QSizePolicy
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt, QTimer
@@ -6,7 +7,7 @@ from PyQt6.QtWidgets import QWidget
 from datetime import datetime
 from gui.stock_chart_popup import StockChartPopup
 
-# Home page
+
 class DashboardPage(QWidget):
     def __init__(self, token):
         super().__init__()
@@ -55,23 +56,39 @@ class DashboardPage(QWidget):
         from PyQt6.QtWidgets import QGridLayout
         grid = QGridLayout()
 
-        # Place all cards at precise positions in the grid
+
         # Top row
         grid.addWidget(self.create_top_gainers_card(), 0, 0)
         grid.addWidget(self.create_top_loser_card(), 0, 1)
-        grid.addWidget(self.create_card("Market Insights", "market_insights_value"), 1, 0)
+        grid.addWidget(self.create_card(" ", "market_insights_value"), 1, 0)
         # Bottom row
         grid.addWidget(self.create_active_stocks_card(), 0, 2)
         grid.addWidget(self.create_suggestions_card(), 1, 1)
         grid.addWidget(self.create_stock_alerts_card(), 1, 2)
 
         self.setLayout(grid)
+
+        # Set the text after layout has been applied
+        self.update_card(
+            "market_insights_value",
+            "<div style='color:black;'>"
+            "<div style='font-size:17px; font-weight:bold; text-align:center; padding-bottom:5px;'>Developed by GSC Pvt</div>"
+            "<div style='font-size:14px; text-align:center;'>"
+            "Developers:<br>"
+            "Amrinder Singh<br>"
+            "Felicia Forester<br>"
+            "Savian Brown<br>"
+            "Saniah Weston<br>"
+            "Jeivan Riely"
+            "</div></div>"
+        )
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_active_stocks)
         self.timer.timeout.connect(self.update_top_gainers)
         self.timer.timeout.connect(self.update_top_losers)
         self.timer.timeout.connect(self.update_stock_alerts)
-        self.timer.start(25000)
+        self.timer.start(5000)
 
     def create_top_gainers_card(self):
         self.top_gainers_card = QFrame()
@@ -310,7 +327,7 @@ class DashboardPage(QWidget):
                         highlight_label.setStyleSheet(f"border: none; background-color: none; color: {color};")
                         row_layout.addWidget(highlight_label)
                     stock_box.setLayout(row_layout)
-                    # Connect click event to open chart popup if symbol exists
+                   
                     if "symbol" in stock:
                         symbol = stock["symbol"]
                         def make_click_handler(sym=symbol):
@@ -410,3 +427,6 @@ class DashboardPage(QWidget):
     def open_chart_popup(self, symbol):
         self.chart_popup = StockChartPopup(symbol, self.token)
         self.chart_popup.show()
+    def open_customer_page(self):
+        self.customer_page = CustomerPage()
+        self.customer_page.show()

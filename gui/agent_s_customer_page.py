@@ -7,7 +7,7 @@ from PyQt6.QtCore import Qt, QTimer
 import requests
 
 
-class CustomerPage(QWidget):
+class AgentsCustomerPage(QWidget):
     def __init__(self, token):
         self.token = token
         self.user_name = "Customer"
@@ -31,12 +31,23 @@ class CustomerPage(QWidget):
         self.balance_label = QLabel()
         self.balance_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.balance_label.setStyleSheet("font-size: 16px; color: #2c3e50; padding-right: 10px;")
+        self.balance_label.setText("Balance: $0.00")
         main_layout.addWidget(self.balance_label)
+
+        from PyQt6.QtWidgets import QComboBox
+
+        # Inside __init__ after setting up main_layout
+        self.selected_customer_id = None
+        self.customer_dropdown = QComboBox()
+        self.customer_dropdown.currentIndexChanged.connect(self.handle_customer_selection)
+        main_layout.addWidget(self.customer_dropdown)
 
         # Holdings Table
         self.holdings_table = QTableWidget(0, 5)
         self.holdings_table.setHorizontalHeaderLabels(["Company", "Quantity", "Avg Buy Price", "Current Price", "P/L"])
         main_layout.addWidget(self.holdings_table)
+
+        self.fetch_customers_list()
 
         # Buy/Sell Layouts
         actions_layout = QHBoxLayout()
@@ -53,7 +64,9 @@ class CustomerPage(QWidget):
 
         self.setLayout(main_layout)
 
-        self.fetch_user_info()
+        # Removed this line so it doesn't fetch agent info at start
+        # self.fetch_user_info()
+        # self.update_header()  # Set default header initially
 
     def fetch_user_info(self):
         try:
@@ -70,7 +83,7 @@ class CustomerPage(QWidget):
             print("Error fetching user info:", e)
 
     def update_header(self):
-        self.title_label.setText(f"{self.user_name}'s Portfolio")
+        self.title_label.setText(f"{self.user_name}'s Dashboard")
         self.balance_label.setText(f"Balance: ${self.account_balance:.2f}")
         self.balance_label.setStyleSheet("font-size: 16px; color: white; padding-right: 10px;")
 
@@ -104,10 +117,13 @@ class CustomerPage(QWidget):
         self.sell_dropdown.blockSignals(False)
 
     def load_holdings_data(self):
+        if not self.selected_customer_id:
+            return
         try:
             print("Fetching holdings data...")
             headers = {"Authorization": f"Bearer {self.token}"}
-            response = requests.get("http://127.0.0.1:9000/trade/portfolio", headers=headers)
+            url = f"http://127.0.0.1:9000/agent/customer/{self.selected_customer_id}/portfolio"
+            response = requests.get(url, headers=headers)
             print("Response status:", response.status_code)
             print("Response content:", response.text)
             if response.status_code == 200:
@@ -206,7 +222,8 @@ class CustomerPage(QWidget):
             stock = self.buy_dropdown.currentText()
             headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
             data = {"symbol": stock, "quantity": qty}
-            response = requests.post("http://127.0.0.1:9000/trade/buy", json=data, headers=headers)
+            url = f"http://127.0.0.1:9000/agent/customer/{self.selected_customer_id}/buy"
+            response = requests.post(url, json=data, headers=headers)
 
             if response.status_code == 200:
                 result = response.json()
@@ -219,7 +236,7 @@ class CustomerPage(QWidget):
                 )
                 QMessageBox.information(self, "Buy Success", msg)
                 self.load_holdings_data()
-                self.fetch_user_info()
+                self.fetch_customer_balance()
             else:
                 try:
                     error_msg = response.json().get("error", response.text)
@@ -239,7 +256,8 @@ class CustomerPage(QWidget):
             stock = self.sell_dropdown.currentText()
             headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
             data = {"symbol": stock, "quantity": qty}
-            response = requests.post("http://127.0.0.1:9000/trade/sell", json=data, headers=headers)
+            url = f"http://127.0.0.1:9000/agent/customer/{self.selected_customer_id}/sell"
+            response = requests.post(url, json=data, headers=headers)
 
             if response.status_code == 200:
                 result = response.json()
@@ -252,7 +270,7 @@ class CustomerPage(QWidget):
                 )
                 QMessageBox.information(self, "Sell Success", msg)
                 self.load_holdings_data()
-                self.fetch_user_info()
+                self.fetch_customer_balance()
             else:
                 error_msg = response.json().get("error", response.text)
                 QMessageBox.warning(self, "Sell Failed", f"Error: {error_msg}")
@@ -260,3 +278,45 @@ class CustomerPage(QWidget):
             QMessageBox.warning(self, "Invalid Input", "Please enter a valid whole number")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+
+    def fetch_customers_list(self):
+        try:
+            headers = {"Authorization": f"Bearer {self.token}"}
+            response = requests.get("http://127.0.0.1:9000/agent/customers", headers=headers)
+            if response.status_code == 200:
+                customers = response.json()
+                self.customer_dropdown.clear()
+                self.customer_map = {}
+                for customer in customers:
+                    full_name = f"{customer['first_name']} {customer['last_name']}"
+                    self.customer_map[full_name] = customer["id"]
+                    self.customer_dropdown.addItem(full_name)
+            else:
+                print("Failed to fetch customer list:", response.status_code)
+        except Exception as e:
+            print("Error fetching customers:", e)
+
+    def handle_customer_selection(self, index):
+        name = self.customer_dropdown.currentText()
+        self.selected_customer_id = self.customer_map.get(name)
+        print(f"Selected Customer ID: {self.selected_customer_id}")
+        self.load_holdings_data()
+        self.fetch_customer_balance()
+
+    def fetch_customer_balance(self):
+        if not self.selected_customer_id:
+            return
+        try:
+            headers = {"Authorization": f"Bearer {self.token}"}
+            url = f"http://127.0.0.1:9000/agent/customer/{self.selected_customer_id}/me"
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                user_data = response.json()
+                full_name = user_data.get("name", "Customer")
+                self.user_name = full_name.split()[0].capitalize()
+                self.account_balance = user_data.get("account_balance", 0.0)
+                self.update_header()
+            else:
+                print("Failed to fetch customer info:", response.status_code)
+        except Exception as e:
+            print("Error fetching customer info:", e)
