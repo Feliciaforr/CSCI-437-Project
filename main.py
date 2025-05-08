@@ -18,7 +18,7 @@ if __name__ == "__main__":
         alert_runner = subprocess.Popen(["python", "backend/alerts/alert_runner.py"])
         processes.append(alert_runner)
 
-        time.sleep(15) 
+        time.sleep(20) 
         main_app = subprocess.Popen(["python", "gui/MainApp.py"])
         processes.append(main_app)
 
